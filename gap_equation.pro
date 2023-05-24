@@ -16,6 +16,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    differential.h \
     gapequation.h \
     integral.h \
+    mvector.h \
     solve_self-consistent.h

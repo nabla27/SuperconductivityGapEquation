@@ -1,23 +1,46 @@
 #include "solve_self-consistent.h"
-#include "integral.h"
 #include "gapequation.h"
 #include <math.h>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
-int main()
+//debug
+#include "mvector.h"
+#include "differential.h"
+
+void createGapData(const std::string& filePath)
 {
     GapEquation gapEquation;
 
-    std::ofstream fout("E:/repos/SuperconductivityGapEquation/gap.csv");
+    std::ofstream fout(filePath);
 
-    for(double T = 0.005; T < 2.0; T += 0.005)
+    static constexpr size_t dataPoints = 1200;
+    static constexpr double init = 1.5;
+    static constexpr double eps = 1e-4;
+
+    for(size_t i = 1; i < dataPoints + 1; ++i)
     {
+        double T = static_cast<double>(i) / 1000.0;
+
         gapEquation.param.T = T;
-        const double value = SolveSelfConsistent<SolveSCAlgorithm::Steffensen>::solve(&gapEquation, &GapEquation::gapEquation, 1.5, 1e-4);
-        std::cout << T << " : " << value << std::endl;
-        fout << T << ", " << value << "\n";
+        const double gap = SolveSelfConsistent<SolveSCAlgorithm::Steffensen>::solve(&gapEquation, &GapEquation::gapEquation, init, eps);
+
+        std::cout << T << " : " << gap << std::endl;
+        fout << T << ", " << gap << "\n";
     }
+}
+
+int main()
+{
+    //createGapData("E:/repos/SuperconductivityGapEquation/gnuplot/gap.csv");
+
+    std::vector<std::array<double, 2> > data;
+    data = LoadVector::load<double, 2>("E:/repos/SuperconductivityGapEquation/gnuplot/gap.csv");
+
+    std::vector<double> diffGap = Differential<DiffAlgorithm::Central>::differentiate(data);
+
+    assignmentStdVec(diffGap, diffGap * 2.0 / 3.2 * diffGap);
 
     return 0;
 }
