@@ -10,4 +10,4 @@ BCS理論によるシングルバンドフルギャップの熱容量の温度�
 
 BCS理論によるマルチバンドフルギャップの熱容量の温度依存性
 
-![multiband1](https://github.com/nabla27/SuperconductivityGapEquation/assets/63175080/d5fc54ba-21ff-4fc6-bf79-3ae3d1835e7c)
+![multiband1](https://github.com/nabla27/SuperconductivityGapEquation/assets/63175080/57423ffd-066d-4055-8085-3c996ecd0472)
