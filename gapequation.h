@@ -2,8 +2,11 @@
 #define GAPEQUATION_H
 
 #include <cmath>
+#include <vector>
 #include "integral.h"
 #include "solve_self-consistent.h"
+#include "differential.h"
+#include "mvector.h"
 
 class GapEquation
 {
@@ -37,5 +40,73 @@ public:
         return gap / q * Integral<IntegralAlgorithm::Simpson>::integrate(this, &GapEquation::integrand, 0.0, energyCut, 0.0001);
     }
 };
+
+
+
+
+
+
+class HeatCapacity
+{
+public:
+    HeatCapacity(const std::vector<double>& gap, const std::vector<double>& temp)
+        : _gap(gap)
+        , _temp(temp)
+    {
+        setGapDiff();
+    }
+    virtual ~HeatCapacity() {}
+
+public:
+    struct Parameter
+    {
+        size_t index = 0;
+        double cutOff = 500;
+        double kB = 1.0;
+        double Ef = 100000;
+    } param;
+
+public:
+    double integrand(const double& x)
+    {
+        const double T = _temp[param.index];
+        const double gap = _gap[param.index];
+        //const double energy = std::sqrt(x * x + gap * gap);
+        //const double coshFactor = std::cosh(energy * 0.5 / (param.kB * T));
+
+        //return (energy * energy - T * 0.5 * _gapDiff[param.index]) / (coshFactor * coshFactor);
+
+        const double energy = std::sqrt((x * x - param.Ef) * (x * x - param.Ef) + gap * gap);
+        const double eexp = std::exp(- energy / T);
+
+        return x * x * (energy * energy - T * 0.5 * _gapDiff[param.index]) * (eexp / T) / ((eexp + 1.0) * (eexp + 1.0));
+    }
+
+    double calHeatCapacity(const size_t& index)
+    {
+        param.index = index;
+        const double T = _temp[param.index];
+        const double upperLim = std::sqrt(param.Ef + param.cutOff);
+        const double lowerLim = std::sqrt(param.Ef - param.cutOff);
+        return (1.0/T) * Integral<IntegralAlgorithm::Simpson>::integrate(this, &HeatCapacity::integrand, lowerLim, upperLim, 1e-3);
+    }
+
+private:
+    void setGapDiff()
+    {
+        _gapDiff = Differential<DiffAlgorithm::Central>::differentiate(_gap * _gap, _temp);
+    }
+
+private:
+    std::vector<double> _gap;
+    std::vector<double> _temp;
+    std::vector<double> _gapDiff;
+};
+
+
+
+
+
+
 
 #endif // GAPEQUATION_H

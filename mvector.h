@@ -128,33 +128,30 @@ public:
     virtual ~LoadVector() {}
 
 private:
-    template<typename T, typename U>
-    static void setDataFromStr(T& array, const U& index, const std::string& str)
+    template<typename T>
+    static void appendDataFromStr(std::vector<T>& array, const std::string& str)
     {
         if constexpr(std::is_same_v<T, double>)
-            array[index] = std::stod(str);
+            array.push_back(std::stod(str));
         else if constexpr(std::is_same_v<T, float>)
-            array[index] = std::stof(str);
+            array.push_back(std::stof(str));
         else if constexpr(std::is_same_v<T, int>)
-            array[index] = std::stoi(str);
+            array.push_back(std::stoi(str));
         else if constexpr(std::is_same_v<T, std::string>)
-            array[index] = str;
-        else
-            return;
+            array.push_back(str);
     }
 
 public:
     template<typename T, size_t N>
-    static std::vector<std::array<T, N>> load(const std::string& path, const char& separator = ',')
+    static std::vector<std::vector<T>> load(const std::string& path, const char& separator = ',')
     {
-        std::vector<std::array<T, N>> data(0);
+        std::vector<std::vector<T>> data(N, std::vector<T>({}));
 
         std::ifstream fin(path);
         if(fin.fail()) return data;
 
         std::string str = "";
         std::string stack = "";
-        std::array<T, N> line({});
 
         while(std::getline(fin, str))
         {
@@ -164,7 +161,8 @@ public:
             {
                 if(c == separator)
                 {
-                    setDataFromStr(line, col, stack);
+                    if(col < N)
+                        appendDataFromStr(data[col], stack);
 
                     col += 1;
 
@@ -180,20 +178,18 @@ public:
                 }
             }
 
-            if(stack.size() > 0)
+            if(stack.size() > 0 && col < N)
             {
-                setDataFromStr(line, col, stack);
+                appendDataFromStr(data[col], stack);
                 stack.clear();
             }
-
-            data.push_back(line);
         }
 
         return data;
     }
 
     template<typename T, size_t N>
-    std::vector<std::array<T, N>> load()
+    std::vector<std::vector<T>> load()
     {
         return LoadVector::load<T, N>(_path, separator);
     }

@@ -31,16 +31,69 @@ void createGapData(const std::string& filePath)
     }
 }
 
+void createHeatCapacityData(const std::string& filePath,
+                            const std::vector<double>& gap,
+                            const std::vector<double>& temp)
+{
+    HeatCapacity heatCapacity(gap, temp);
+
+    std::ofstream fout(filePath);
+
+    const size_t dataSize = gap.size();
+    for(size_t i = 0; i < dataSize; ++i)
+    {
+        const double T = temp[i];
+        const double C = heatCapacity.calHeatCapacity(i);
+
+        static constexpr double gamma = 520.174;
+        std::cout << T << " : " << C << " : " << C / T << std::endl;
+        fout << T << ", " << C << ", " << C / T / gamma << "\n";
+    }
+}
+
+std::string replaceStr(const std::string& str, const char& before, const char& after)
+{
+    std::string replaced = "";
+    const size_t strSize = str.size();
+    replaced.reserve(strSize);
+
+    for(const char& c : str)
+    {
+        if(c == before)
+            replaced.push_back(after);
+        else
+            replaced.push_back(c);
+    }
+
+    return replaced;
+}
+
+void createHeatCapacityAlphaData(const std::string& folderPath,
+                                 const std::vector<double>& gap,
+                                 const std::vector<double>& temp,
+                                 const std::vector<double>& alphaList)
+{
+    static constexpr double alphaBCS = 1.76;
+
+    for(const double& alpha : alphaList)
+    {
+        const std::string alphaStr = replaceStr(std::to_string(alpha), '.', 'p');
+        const std::string path = folderPath + "heatCapacity_" + alphaStr + ".csv";
+        createHeatCapacityData(path, gap * (alpha / alphaBCS), temp);
+    }
+}
+
 int main()
 {
     //createGapData("E:/repos/SuperconductivityGapEquation/gnuplot/gap.csv");
 
-    std::vector<std::array<double, 2> > data;
-    data = LoadVector::load<double, 2>("E:/repos/SuperconductivityGapEquation/gnuplot/gap.csv");
+    std::vector<std::vector<double> > gapData = LoadVector::load<double, 2>("E:/repos/SuperconductivityGapEquation/gnuplot/gap.csv");
 
-    std::vector<double> diffGap = Differential<DiffAlgorithm::Central>::differentiate(data);
+    //assignmentStdVec(gapData[1], gapData[1] * (1.76/1.76));
+    //createHeatCapacityData("E:/repos/SuperconductivityGapEquation/gnuplot/heatCapacity2.csv", gapData[1], gapData[0]);
 
-    assignmentStdVec(diffGap, diffGap * 2.0 / 3.2 * diffGap);
+    const std::vector<double> alphaList = { 2.1, 1.76, 1.2, 0.7 };
+    createHeatCapacityAlphaData("E:/repos/SuperconductivityGapEquation/gnuplot/", gapData[1], gapData[0], alphaList);
 
     return 0;
 }
