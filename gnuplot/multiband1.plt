@@ -16,5 +16,5 @@ set label 1 "{/Symbol D}_{1} : {/Symbol D}_{2} = 1.76 : 0.7" at 0.07, 1.7 font "
 set label 2 "{/Symbol g}_{1} : {/Symbol g}_{2} = 65 : 35" at 0.07, 1.5 font "Arial, 16"
 
 plot "heatCapacityAll.csv" using 1:($3 * ratio1) with lines title "C_{1}*{/Symbol g}_{1}/({/Symbol g}_{1} + {/Symbol g}_{2})" \
-, "heatCapacityAll.csv" using 1:($5 * ratio2) with lines title "C_{2}*{/Symbol g}_{1}/({/Symbol g}_{1} + {/Symbol g}_{2})" \
+, "heatCapacityAll.csv" using 1:($5 * ratio2) with lines title "C_{2}*{/Symbol g}_{2}/({/Symbol g}_{1} + {/Symbol g}_{2})" \
 , "heatCapacityAll.csv" using 1:($3 * ratio1 + $5 * ratio2) with linespoints title "C_{e}"

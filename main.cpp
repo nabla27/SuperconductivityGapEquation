@@ -89,9 +89,6 @@ int main()
 
     std::vector<std::vector<double> > gapData = LoadVector::load<double, 2>("E:/repos/SuperconductivityGapEquation/gnuplot/gap.csv");
 
-    //assignmentStdVec(gapData[1], gapData[1] * (1.76/1.76));
-    //createHeatCapacityData("E:/repos/SuperconductivityGapEquation/gnuplot/heatCapacity2.csv", gapData[1], gapData[0]);
-
     const std::vector<double> alphaList = { 2.1, 1.76, 1.2, 0.7 };
     createHeatCapacityAlphaData("E:/repos/SuperconductivityGapEquation/gnuplot/", gapData[1], gapData[0], alphaList);
 

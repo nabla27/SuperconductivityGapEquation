@@ -17,8 +17,8 @@ public:
 public:
     struct Parameter
     {
-        static constexpr double kB = 1; //1.38 * 1e-23; //ボルツマン定数
-        static constexpr double hbar = 1; //1.054 * 1e-34; //ディラック定数
+        static constexpr double kB = 1; //ボルツマン定数
+        static constexpr double hbar = 1; //ディラック定数
         static constexpr double Tc = 1.0; //転移温度
         double omegaCut = kB * Tc / hbar * 300; //カットオフ角周波数
         double gap = 0.0f; //超伝導ギャップ
@@ -71,11 +71,6 @@ public:
     {
         const double T = _temp[param.index];
         const double gap = _gap[param.index];
-        //const double energy = std::sqrt(x * x + gap * gap);
-        //const double coshFactor = std::cosh(energy * 0.5 / (param.kB * T));
-
-        //return (energy * energy - T * 0.5 * _gapDiff[param.index]) / (coshFactor * coshFactor);
-
         const double energy = std::sqrt((x * x - param.Ef) * (x * x - param.Ef) + gap * gap);
         const double eexp = std::exp(- energy / T);
 
